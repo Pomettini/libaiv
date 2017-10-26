@@ -14,3 +14,78 @@ struct aiv_list *aiv_list_new(int *err_code)
     memset(list, 0, sizeof(struct aiv_list));
     return list;
 }
+
+int aiv_list_append(struct aiv_list *list, void *element)
+{
+    struct aiv_list_item *list_item = malloc(sizeof(struct aiv_list_item));
+    if (!list_item)
+    {
+        return AIV_NO_MEM;
+    }
+    list_item->prev = list->tail;
+    list_item->next = NULL;
+    list_item->data = element;
+
+    if (list_item->prev)
+    {
+        list_item->prev->next = list_item;
+    }
+
+    if (!list->head)
+    {
+        list->head = list_item;
+    }
+
+    list->tail = list_item;
+
+    return AIV_OK;
+}
+
+void aiv_list_destroy(struct aiv_list *list)
+{
+    struct aiv_list_item *item = list->head;
+    while(item)
+    {
+        struct aiv_list_item *next = item->next;
+        free(item);
+        item = next; 
+    }
+    free(list);
+}
+
+int aiv_list_remove(struct aiv_list *list, void *element)
+{
+    struct aiv_list_item *item = list->head;
+    while(item)
+    {
+        if(element == item->data)
+        {
+            if(item == list->head)
+            {
+                list->head = item->next;
+            }
+
+            if(item == list->tail)
+            {
+                list->tail = item->prev;
+            }
+
+            if(item->prev)
+            {
+                item->prev->next = item->next;
+            }
+
+            if(item->next)
+            {
+                item->next->prev = item->prev;
+            }
+
+            free(item);
+
+            return AIV_OK;
+        }
+        item = item->next;
+         
+    }
+    return AIV_NOT_FOUND;
+}
