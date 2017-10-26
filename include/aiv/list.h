@@ -12,6 +12,7 @@ struct aiv_list
 {
     struct aiv_list_item *head;
     struct aiv_list_item *tail;
+    int is_iterating;
 };
 
 // create a new list
@@ -25,3 +26,5 @@ int aiv_list_remove(struct aiv_list *, void *);
 int aiv_list_remove_index(struct aiv_list *, unsigned int);
 // insert an element in the specified position
 int aiv_list_insert(struct aiv_list *, unsigned int, void *);
+// iterator pattern
+struct aiv_list_item *aiv_list_iter(struct aiv_list *, struct aiv_list_item **);

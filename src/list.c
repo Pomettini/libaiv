@@ -89,3 +89,58 @@ int aiv_list_remove(struct aiv_list *list, void *element)
     }
     return AIV_NOT_FOUND;
 }
+
+int aiv_list_remove_index(struct aiv_list *list, unsigned int index)
+{
+    unsigned int counter = 0;
+    struct aiv_list_item *item = list->head;
+    while(item)
+    {
+        if(counter == index)
+        {
+            if(item == list->head)
+            {
+                list->head = item->next;
+            }
+
+            if(item == list->tail)
+            {
+                list->tail = item->prev;
+            }
+
+            if(item->prev)
+            {
+                item->prev->next = item->next;
+            }
+
+            if(item->next)
+            {
+                item->next->prev = item->prev;
+            }
+
+            free(item);
+
+            return AIV_OK;
+        }
+        counter++;
+        item = item->next;
+    }
+    return AIV_NOT_FOUND;
+}
+
+struct aiv_list_item *aiv_list_iter(struct aiv_list *list, struct aiv_list_item **context)
+{
+    if (list->is_iterating && !*context) {
+        list->is_iterating = 0;
+        return NULL;
+    }
+    
+    if (!*context) {
+        list->is_iterating = 1;
+        *context = list->head;
+        return *context;
+    }
+
+    *context = (*context)->next;
+    return *context;
+}

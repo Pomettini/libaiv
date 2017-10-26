@@ -153,6 +153,105 @@ int test_aiv_list_remove_non_exsistent()
     return ret;
 }
 
+int test_aiv_list_remove_index_empty()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    
+        if(!list)
+            return -1;
+
+    int ret = aiv_list_remove_index(list, 100);
+    aiv_list_destroy(list);
+    return ret;
+}
+
+int test_aiv_list_remove_index()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    
+        if(!list)
+            return -1;
+
+    int ret = 0;
+    int a = 768;
+
+    ret = aiv_list_append(list, &a);
+    if(ret)
+    {
+        aiv_list_destroy(list);
+        return ret;
+    }
+
+    ret = aiv_list_remove_index(list, 0);
+    aiv_list_destroy(list);
+    return ret;
+}
+
+int test_aiv_list_remove_index_two()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    if(!list)
+        return -1;
+
+    int ret = 0;
+    int a = 768;
+    const char* c = "hello";
+
+    ret = aiv_list_append(list, (void*)c);
+    if(ret)
+    {
+        aiv_list_destroy(list);
+        return ret;
+    }
+
+    ret = aiv_list_remove_index(list, 0);
+    if(ret)
+    {
+        aiv_list_destroy(list);
+        return ret;
+    }
+
+    ret = aiv_list_append(list, &a);
+    if(ret)
+    {
+        aiv_list_destroy(list);
+        return ret;
+    }
+
+    ret = aiv_list_remove_index(list, 0);
+    aiv_list_destroy(list);
+    return ret;
+}
+
+int test_aiv_list_iter()
+{   
+
+    struct aiv_list *list = aiv_list_new(NULL);
+    if(!list)
+        return -1;
+
+    struct aiv_list_item *context = NULL;
+    struct aiv_list_item *item = NULL;
+    int counter = 0;
+
+    int a = 345;
+
+    int ret = aiv_list_append(list, &a);
+    if(ret)
+    {
+        aiv_list_destroy(list);
+        return ret;
+    }
+
+    while((item = aiv_list_iter(list, &context)))
+    {
+        counter++;
+    }
+
+    aiv_list_destroy(list);
+    return counter;
+}
+
 int main(int argc, char **argv)
 {
     test(test_aiv_list_new);
@@ -162,7 +261,10 @@ int main(int argc, char **argv)
     test(test_aiv_list_remove);
     test(test_aiv_list_remove_two);
     test_equal(test_aiv_list_remove_non_exsistent, AIV_NOT_FOUND);
-    
+    test_equal(test_aiv_list_remove_index_empty, AIV_NOT_FOUND);
+    test(test_aiv_list_remove_index);
+    test(test_aiv_list_remove_index_two);
+    test_equal(test_aiv_list_iter, 1);
 
     fprintf(stdout, "all tests passed\n");
     return 0;
