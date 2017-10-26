@@ -49,3 +49,5 @@ void aiv_list_sort(struct aiv_list *, int (*)(void *, void *));
 void aiv_list_reverse(struct aiv_list *);
 // return a new list (copy) with the item starting from the specified item
 struct aiv_list *aiv_list_sublist(struct aiv_list *, unsigned int);
+// return the element of a list at an index
+void aiv_list_get(struct aiv_list *, void *);
