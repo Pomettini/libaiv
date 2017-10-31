@@ -54,6 +54,33 @@ int test_aiv_list_append_null()
     return ret;
 }
 
+int test_aiv_list_append_uniq()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+
+    if (!list)
+        return -1;
+
+    int element = 666;
+    
+    int ret = aiv_list_append_uniq(list, &element);
+    return ret;
+}
+    
+int test_aiv_list_append_uniq_existent()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+
+    if (!list)
+        return -1;
+
+    int element = 666;
+
+    aiv_list_append_uniq(list, &element);
+    int ret = aiv_list_append_uniq(list, &element);
+    return ret;
+}
+
 int test_aiv_list_remove_empty()
 {
     struct aiv_list *list = aiv_list_new(NULL);
@@ -157,8 +184,8 @@ int test_aiv_list_remove_index_empty()
 {
     struct aiv_list *list = aiv_list_new(NULL);
     
-        if(!list)
-            return -1;
+    if(!list)
+        return -1;
 
     int ret = aiv_list_remove_index(list, 100);
     aiv_list_destroy(list);
@@ -225,8 +252,8 @@ int test_aiv_list_remove_index_two()
 
 int test_aiv_list_iter()
 {   
-
     struct aiv_list *list = aiv_list_new(NULL);
+    
     if(!list)
         return -1;
 
@@ -252,11 +279,105 @@ int test_aiv_list_iter()
     return counter;
 }
 
-int main(int argc, char **argv)
+int test_aiv_list_len()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    
+    if(!list)
+        return -1;
+
+    int counter = 0;
+    int ret = 0;
+
+    int a = 666;
+    int b = 111;
+
+    aiv_list_append(list, &a);
+    aiv_list_append(list, &b);
+
+    return aiv_list_len(list);
+}
+
+int test_aiv_list_slow_len()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    
+    if(!list)
+        return -1;
+
+    int counter = 0;
+    int ret = 0;
+
+    int a = 666;
+    int b = 6666;
+    int c = 66666;
+
+    aiv_list_append(list, &a);
+    aiv_list_append(list, &b);
+    aiv_list_append(list, &c);
+
+    return aiv_list_slow_len(list);
+}
+
+int test_aiv_list_contains()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    
+    if(!list)
+        return -1;
+
+    int a = 666;
+
+    aiv_list_append(list, &a);
+    
+    return aiv_list_contains(list, &a);
+}
+
+int test_aiv_list_contains_not()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    
+    if(!list)
+        return -1;
+
+    int a = 666;
+    int b = 6666;
+
+    aiv_list_append(list, &a);
+    
+    return aiv_list_contains(list, &b);
+}
+
+int test_aiv_list_contains_at()
+{
+    struct aiv_list *list = aiv_list_new(NULL);
+    
+    if(!list)
+        return -1;
+
+    int a = 666;
+    int b = 6666;
+    int c = 66666;
+
+    aiv_list_append(list, &a);
+    aiv_list_append(list, &b);
+    aiv_list_append(list, &c);
+
+    int element_pos = 0;
+    // aiv_list_contains_at(list, &c, element_pos);
+
+    aiv_list_destroy(list);
+    
+    return element_pos;
+}
+
+int test_list_run()
 {
     test(test_aiv_list_new);
     test(test_aiv_list_append);
     test(test_aiv_list_append_null);
+    test(test_aiv_list_append_uniq);
+    test_equal(test_aiv_list_append_uniq_existent, AIV_HAS_ELEMENT);
     test_equal(test_aiv_list_remove_empty, AIV_NOT_FOUND);
     test(test_aiv_list_remove);
     test(test_aiv_list_remove_two);
@@ -265,6 +386,11 @@ int main(int argc, char **argv)
     test(test_aiv_list_remove_index);
     test(test_aiv_list_remove_index_two);
     test_equal(test_aiv_list_iter, 1);
+    test_equal(test_aiv_list_len, 2);
+    test_equal(test_aiv_list_slow_len, 3);
+    test(test_aiv_list_contains);
+    test_equal(test_aiv_list_contains_not, AIV_NOT_FOUND);
+    test_equal(test_aiv_list_contains_at, 2);
 
     fprintf(stdout, "all tests passed\n");
     return 0;

@@ -1,4 +1,5 @@
 #include <aiv/list.h>
+#include <stdio.h>
 #include <aiv/error.h>
 
 struct aiv_list *aiv_list_new(int *err_code)
@@ -25,6 +26,44 @@ int aiv_list_append(struct aiv_list *list, void *element)
     list_item->prev = list->tail;
     list_item->next = NULL;
     list_item->data = element;
+    
+    if (list_item->prev)
+    {
+        list_item->prev->next = list_item;
+    }
+    
+    if (!list->head)
+    {
+        list->head = list_item;
+    }
+    
+    list->tail = list_item;
+    list->length += 1;
+
+    return AIV_OK;
+}
+
+int aiv_list_append_uniq(struct aiv_list *list, void *element)
+{
+    unsigned int counter = 0;
+    struct aiv_list_item *item = list->head;
+    while(item)
+    {
+        if (element == item->data)
+            return AIV_HAS_ELEMENT;
+
+        counter++;
+        item = item->next;
+    }
+    
+    struct aiv_list_item *list_item = malloc(sizeof(struct aiv_list_item));
+    if (!list_item)
+    {
+        return AIV_NO_MEM;
+    }
+    list_item->prev = list->tail;
+    list_item->next = NULL;
+    list_item->data = element;
 
     if (list_item->prev)
     {
@@ -37,6 +76,7 @@ int aiv_list_append(struct aiv_list *list, void *element)
     }
 
     list->tail = list_item;
+    list->length += 1;
 
     return AIV_OK;
 }
@@ -50,6 +90,7 @@ void aiv_list_destroy(struct aiv_list *list)
         free(item);
         item = next; 
     }
+    list->length -= 1;
     free(list);
 }
 
@@ -81,6 +122,7 @@ int aiv_list_remove(struct aiv_list *list, void *element)
             }
 
             free(item);
+            list->length += 1;
 
             return AIV_OK;
         }
@@ -119,7 +161,8 @@ int aiv_list_remove_index(struct aiv_list *list, unsigned int index)
             }
 
             free(item);
-
+            list->length -= 1;
+            
             return AIV_OK;
         }
         counter++;
@@ -144,3 +187,74 @@ struct aiv_list_item *aiv_list_iter(struct aiv_list *list, struct aiv_list_item 
     *context = (*context)->next;
     return *context;
 }
+
+void aiv_list_get(struct aiv_list *list, void *element)
+{
+    
+}
+
+int aiv_list_len(struct aiv_list *list)
+{
+    return list->length;
+}
+
+int aiv_list_slow_len(struct aiv_list *list)
+{
+    unsigned int counter = 0;
+    struct aiv_list_item *item = list->head;
+
+    while(item)
+    {
+        counter++;
+        item = item->next;
+    }
+
+    return counter;
+}
+
+int aiv_list_contains(struct aiv_list *list, void *element)
+{
+    unsigned int counter = 0;
+    struct aiv_list_item *item = list->head;
+
+    while(item)
+    {
+        if(element == item->data)
+            return AIV_OK;
+
+        counter++;
+        item = item->next;
+    }
+
+    return AIV_NOT_FOUND;
+}
+
+int aiv_list_contains_at(struct aiv_list *list, void *element, unsigned int pos)
+{
+    unsigned int counter = 0;
+    struct aiv_list_item *item = list->head;
+
+    while(item)
+    {
+        if(element == item->data)
+        {
+            pos = counter;
+            return AIV_OK;
+        }
+
+        counter++;
+        item = item->next;
+    }
+
+    return AIV_NOT_FOUND;
+}
+
+// void aiv_list_print(struct aiv_list *list)
+// {
+//     struct aiv_list_item *item = list->head;
+//     while(item)
+//     {
+//         fprintf(stdout, "%d\n", item->data);
+//         item = item->next; 
+//     }
+// }
