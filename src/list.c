@@ -1,6 +1,7 @@
 #include <aiv/list.h>
 #include <stdio.h>
 #include <aiv/error.h>
+#include <stdlib.h>
 
 struct aiv_list *aiv_list_new(int *err_code)
 {
@@ -247,6 +248,35 @@ int aiv_list_contains_at(struct aiv_list *list, void *element, unsigned int pos)
     }
 
     return AIV_NOT_FOUND;
+}
+
+// Duccio's shuffle implementation™
+void aiv_list_shuffle(struct aiv_list *list)
+{
+    unsigned int len = aiv_list_len(list);
+    if(len <= 1)
+        return;
+
+    struct aiv_list_item *item = list->head;
+    struct aiv_list_item *start = list->head;
+
+    unsigned int random = (unsigned int)((double)rand()/RAND_MAX * len);
+    unsigned int i = 0;
+
+    while (item)
+    {
+        if(i++ == random)
+        {
+            void *current_data = item->data;
+            item->data = list->head->data;
+            list->head->data = current_data;
+            item = start->next;
+            start = item;
+            random = (unsigned int)((double)rand()/RAND_MAX * len);
+            i = 0;
+        }
+        item = item->next;
+    }
 }
 
 // void aiv_list_print(struct aiv_list *list)
